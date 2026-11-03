@@ -150,7 +150,7 @@ const FEM=[
 [7,"tt","cc",48,33],[7,"ar","mq",54,37],
 [8,"mq","tt",56,46],[8,"sl","ar",59,49],
 [9,"tt","sl",0,20,{np:true}],[9,"cc","mq",59,84],
-[10,"sl","cc",null,null,{fecha:"2026-11-08",ht:true}],[10,"ar","tt",null,null,{fecha:"2026-11-08",ht:true}]
+[10,"sl","cc",null,null,{fecha:"2026-11-08",hora:"18:30",lugar:"Bah\u00eda Sur"}],[10,"ar","tt",null,null,{fecha:"2026-11-08",hora:"17:00",lugar:"Bah\u00eda Sur"}]
 ].map(([j,l,v,hs,as,x])=>({j,fecha:"",l:T[l],v:T[v],hs,as,...x}));
 const FJ=["2026-11-08", "2026-11-15", "2026-11-22", "2026-11-29", "2026-12-13", "2026-12-20", "2027-01-10", "2027-01-17", "2027-01-24", "2027-01-31"];
 const EJ=["Los Berenjenas", "ADD Asuncion", "AD Marianistas", "Club Nazaret", "Rota Basketball", "Rota Warriors"];
@@ -177,7 +177,7 @@ const $=id=>document.getElementById(id);
 let li=null,vista="clas",jc=null,pg=null,rol="arbitrar";
 const played=m=>m.hs!==null&&m.as!==null;
 const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"}):"";
-const info=m=>{const t=[fmt(m.fecha),m.ht?"Horario por definir":"",m.ap?"Aplazado":"",m.np?"No presentado: "+(m.hs>m.as?m.v:m.l):""].filter(Boolean).join(" · ");return t?`<div class="d">${t}</div>`:""};
+const info=m=>{const t=[fmt(m.fecha)+(m.hora?" \u00b7 "+m.hora:""),m.lugar||"",m.ht?"Horario por definir":"",m.ap?"Aplazado":"",m.np?"No presentado: "+(m.hs>m.as?m.v:m.l):""].filter(Boolean).join(" · ");return t?`<div class="d">${t}</div>`:""};
 const rest=(L,ms)=>{const r=L.equipos.filter(e=>!ms.some(m=>m.l===e||m.v===e));return r.length?`<div class="rest">Descansa: ${r.join(", ")}</div>`:""};
 
 function clasif(L){
@@ -268,11 +268,12 @@ async function enviar(f){
  st.textContent="Enviando\u2026";$("fbt").disabled=true;
  try{
   const r=await fetch("https://formsubmit.co/ajax/"+MAILFORM,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({_subject:asunto,_captcha:"false",_template:"table",...datos})});
-  const j=await r.json();if(!(j.success===true||j.success==="true"))throw new Error("no");
+  const tx=await r.text();let j=null;try{j=JSON.parse(tx)}catch(_){}if(!(j&&(j.success===true||j.success==="true")))throw new Error(j&&j.message?j.message:j?JSON.stringify(j).slice(0,140):"respuesta no JSON (HTTP "+r.status+")");
   f.hidden=true;st.innerHTML=`<div class="card" style="padding:16px"><b>\u00a1Solicitud enviada!</b><p>Hemos recibido tu hoja de afiliaci\u00f3n. Recuerda que es obligatorio aportar la fotocopia del DNI: la organizaci\u00f3n te indicar\u00e1 c\u00f3mo enviarla.</p></div>`;
- }catch(_){
+ }catch(er){
+  const mot=String(er&&er.message||er).replace(/[<>&]/g,"").slice(0,160);
   const cuerpo=Object.entries(datos).map(([k,v])=>k+": "+v).join("\n");
-  st.innerHTML=`<div class="card" style="padding:14px"><p style="margin:0 0 8px">No se ha podido enviar autom\u00e1ticamente desde este navegador. Puedes enviarlo con tu aplicaci\u00f3n de correo:</p><a class="sbm" style="margin-top:6px" href="mailto:${MAILFORM}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}">Enviar por correo</a></div>`;
+  st.innerHTML=`<div class="card" style="padding:14px"><p style="margin:0 0 8px">No se ha podido enviar autom\u00e1ticamente desde este navegador. Puedes enviarlo con tu aplicaci\u00f3n de correo:</p><p style="margin:0 0 8px;font-size:.8rem;color:var(--muted)">Detalle t\u00e9cnico: ${mot}${/activ/i.test(mot)?" \u2014 falta confirmar el correo de activaci\u00f3n de FormSubmit (mira tambi\u00e9n en spam).":""}</p><a class="sbm" style="margin-top:6px" href="mailto:${MAILFORM}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}">Enviar por correo</a></div>`;
   $("fbt").disabled=false;
  }
 }
