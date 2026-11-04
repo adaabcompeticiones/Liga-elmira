@@ -181,9 +181,10 @@ const JER=[
 [9,"ADD Asuncion","Rota Warriors"],[9,"Rota Basketball","Club Nazaret"],[9,"Los Berenjenas","AD Marianistas"],
 [10,"AD Marianistas","Rota Warriors"],[10,"Club Nazaret","Los Berenjenas"],[10,"ADD Asuncion","Rota Basketball"]
 ].map(([j,l,v])=>({j,fecha:FJ[j-1],l,v,hs:null,as:null}));
+[["Los Berenjenas","19:00"],["AD Marianistas","17:00"],["Rota Warriors","19:00"]].forEach(([l,h])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar="Palacio de Deportes"}});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
- {nombre:"LBAM Bahía de Cádiz",lg:"lbam",aviso:AV,col:["ayf","acd","u4","dipu"],equipos:[],partidos:[]},
+ {nombre:"LBAM Bahía de Cádiz",lg:"lbam",aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
  {nombre:"LBAM Jerez",lg:"lbam",final:4,col:["ayto","dipu","j2031"],equipos:EJ,partidos:JER},
  {nombre:"LBAF Bahía de Cádiz 25-26",lg:"lbaf",final:4,col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
 ];
@@ -229,7 +230,7 @@ function vCap(L){
  const sel=`<div class="tabs sub">${js.map(j=>`<button class="tab ${j===jc?"on":""}" data-j="${j}">J${j}</button>`).join("")}</div>`;
  const rows=ms.map(m=>{const gl=played(m)&&m.hs>m.as,gv=played(m)&&m.as>m.hs;
   return `<div class="m"><div class="h ${gl?"w":""}">${m.l}</div><div class="sc ${played(m)?"":"p"}">${played(m)?m.hs+" – "+m.as:"vs"}</div><div class="${gv?"w":""}">${m.v}</div>${info(m)}</div>`}).join("");
- return sel+`<p class="hint">Elige la jornada y haz una sola captura de la tarjeta de abajo.</p><div class="shot"><div class="shl">${document.querySelector(".a").outerHTML}${document.querySelector(".sp").outerHTML}</div><h3>ADAAB COMPETICIONES</h3><div class="st">${L.nombre} · Jornada ${jc}${fmt(ms[0].fecha)?" · "+fmt(ms[0].fecha):""}</div><h2>Resultados</h2><div class="card">${rows}</div>${rest(L,ms)}<h2>Clasificación</h2>${vClas(L)}</div>`;
+ return sel+`<p class="hint">Elige la jornada y haz una sola captura de la tarjeta de abajo.</p><div class="shot"><div class="shl">${document.querySelector(".a").outerHTML}${document.querySelector(".sp").outerHTML}</div><h3>ADAAB COMPETICIONES</h3><div class="st">${L.nombre} · Jornada ${jc}${fmt((ms[0]||{}).fecha)?" · "+fmt((ms[0]||{}).fecha):""}</div><h2>Resultados</h2><div class="card">${rows}</div>${rest(L,ms)}<h2>Clasificación</h2>${vClas(L)}</div>`;
 }
 function vRank(L){
  const tb=clasif(L);
@@ -332,7 +333,7 @@ async function tarjeta(kind,L,j){
   ["Clasificación ordenada por: Total puntos (Enfrentamiento directo),","Diferencia de puntos, Puntos a favor. Ganados: 2 punto(s). Perdidos: 1 punto(s)."].forEach(t=>{b+=tx(P,y,t,22,{c:"#6b6b70"});y+=30});
   if(L.final){b+=rc(P,y-2,18,18,"#bfe3c6",4)+tx(P+28,y+13,"Zona de fase final",22,{c:"#6b6b70"});y+=30}
  }else{
-  const ms=L.partidos.filter(m=>m.j===j),f=ms[0]?fmt(ms[0].fecha):"";
+  const ms=L.partidos.filter(m=>m.j===j),f=ms[0]?fmt((ms[0]||{}).fecha):"";
   sub=(kind==="res"?"Resultados":"Calendario")+` · Jornada ${j}`+(kind==="cal"&&f?" · "+f:"");
   ms.forEach(m=>{
    const p=played(m),gl=p&&m.hs>m.as,gv=p&&m.as>m.hs,c=W/2;
@@ -380,7 +381,7 @@ function vHome(){
   const ult=pl.length?Math.max(...pl.map(m=>m.j)):0,tot=L.partidos.length?Math.max(...L.partidos.map(m=>m.j)):0;
   let est,det=[];
   if(!L.equipos.length){est="¡Muy pronto!";det.push("Próximamente calendario y clasificación")}
-  else{est=!pl.length?"Por comenzar":pen.length?"En juego":"Finalizada";det.push(pl.length?`${L.equipos.length} equipos · Jornada ${ult} de ${tot}`:`${L.equipos.length} equipos · ${tot} jornadas`);
+  else{est=!L.partidos.length?"¡Muy pronto!":!pl.length?"Por comenzar":pen.length?"En juego":"Finalizada";det.push(!L.partidos.length?`${L.equipos.length} equipos confirmados · Calendario próximamente`:pl.length?`${L.equipos.length} equipos · Jornada ${ult} de ${tot}`:`${L.equipos.length} equipos · ${tot} jornadas`);
    if(pl.length)det.push("Líder: "+clasif(L)[0].e);
    if(pen.length)det.push("Próxima: J"+pen[0].j+(pen[0].fecha?" · "+fmt(pen[0].fecha):""))}
   return `<button class="lcard" data-l="${i}"><div class="lc">${L.lg?`<img class="ll" src="${LG[L.lg].src}" alt="${LG[L.lg].n}">`:""}<div class="lb"><div class="lt"><b>${L.nombre}</b><span class="bd ${est==="En juego"?"on":""}">${est}</span></div>${det.map(d=>`<div class="ld">${d}</div>`).join("")}<div class="go">Ver ${L.equipos.length?"clasificación y resultados":"liga"} →</div></div></div></button>`}).join("");
