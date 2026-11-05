@@ -195,7 +195,7 @@ const JER=[
 [9,"ADD Asuncion","Rota Warriors"],[9,"Rota Basketball","Club Nazaret"],[9,"Los Berenjenas","AD Marianistas"],
 [10,"AD Marianistas","Rota Warriors"],[10,"Club Nazaret","Los Berenjenas"],[10,"ADD Asuncion","Rota Basketball"]
 ].map(([j,l,v])=>({j,fecha:FJ[j-1],l,v,hs:null,as:null}));
-[["Los Berenjenas","19:00"],["AD Marianistas","17:00"],["Rota Warriors","19:00"]].forEach(([l,h])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar="Palacio de Deportes"}});
+[["Los Berenjenas","17:00","Chapín"],["AD Marianistas","19:00","Chapín"],["Rota Warriors","19:00","Chapín"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar=p}});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
  {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
