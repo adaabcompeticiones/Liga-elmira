@@ -31,7 +31,7 @@ main{max-width:760px;margin:0 auto;padding:12px 16px 40px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .tab{border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;border-radius:999px;font-size:.95rem;cursor:pointer}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.sub .tab{border-radius:8px;font-size:.9rem}
+.sub .tab{display:inline-flex;align-items:center;gap:8px;border-radius:12px;font-size:1rem;font-weight:600;padding:10px 14px}.sub .tab svg{width:20px;height:20px;flex:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.95rem}
 th,td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -103,6 +103,7 @@ a.pill{display:block}
 .shr{display:flex;justify-content:flex-end;margin:0 0 10px}h2.jh{display:flex;justify-content:space-between;align-items:center}
 .shv{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:60;overflow:auto;padding:16px}.shv[hidden]{display:none}
 .shb2{max-width:560px;margin:0 auto;background:#fff;border-radius:14px;padding:14px}.shb2 img{width:100%;display:block;border-radius:8px}.shb2 p{font-size:.85rem;color:var(--muted)}
+sup.sd{display:inline-block;width:7px;height:7px;border-radius:50%;background:#d93025;margin-left:4px;vertical-align:top;line-height:0;position:relative;top:2px}
 .pills{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .shl{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 @media(max-width:560px){.top{grid-template-areas:"a s" "t t";grid-template-columns:1fr auto}.ttl{text-align:center}.a img{height:56px;width:56px}}
@@ -195,7 +196,7 @@ const JER=[
 [9,"ADD Asuncion","Rota Warriors"],[9,"Rota Basketball","Club Nazaret"],[9,"Los Berenjenas","AD Marianistas"],
 [10,"AD Marianistas","Rota Warriors"],[10,"Club Nazaret","Los Berenjenas"],[10,"ADD Asuncion","Rota Basketball"]
 ].map(([j,l,v])=>({j,fecha:FJ[j-1],l,v,hs:null,as:null}));
-[["Los Berenjenas","17:00","Chapín"],["AD Marianistas","19:00","Chapín"],["Rota Warriors","19:00","Chapín"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar=p}});
+[["Los Berenjenas","17:00","Palacio de Deportes"],["AD Marianistas","19:00","Palacio de Deportes"],["Rota Warriors","19:00","Palacio de Deportes"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar=p}});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
  {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
@@ -204,7 +205,7 @@ const LIGAS=[
 ];
 /* ================================================= */
 const $=id=>document.getElementById(id);
-let li=null,vista="clas",jc=null,pg=null,rol="arbitrar";
+let li=null,vista="clas",jc=null,pg=null,rol="arbitrar",bk=null;
 const played=m=>m.hs!==null&&m.as!==null;
 const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"}):"";
 const info=m=>{const t=[fmt(m.fecha)+(m.hora?" \u00b7 "+m.hora:""),m.lugar||"",m.ht?"Horario por definir":"",m.ap?"Aplazado":"",m.np?"No presentado: "+(m.hs>m.as?m.v:m.l):""].filter(Boolean).join(" · ");return t?`<div class="d">${t}</div>`:""};
@@ -224,10 +225,12 @@ function clasif(L){
  tb.forEach(x=>{const g=tb.filter(y=>y.pts===x.pts).map(y=>y.e);x.h=g.length>1?mp(x,g):0});
  return tb.sort((a,b)=>b.pts-a.pts||b.h-a.h||b.dif-a.dif||b.pf-a.pf);
 }
+function sancEq(L){return new Set((L.sanc||[]).map(x=>x.tipo==="Equipo"?x.nombre:x.equipo).filter(Boolean))}
 function vClas(L){
- const r=clasif(L).map((x,i)=>`<tr class="${i<(L.final||0)?"fin":""}"><td>${i+1}</td><td class="t">${x.e}</td><td>${x.pj}</td><td>${x.g}</td><td>${x.p}</td><td>${x.pf}</td><td>${x.pc}</td><td>${x.dif>0?"+":""}${x.dif}</td><td class="pts">${x.pts}</td></tr>`).join("");
+ const sq=sancEq(L);
+ const r=clasif(L).map((x,i)=>`<tr class="${i<(L.final||0)?"fin":""}"><td>${i+1}</td><td class="t">${x.e}${sq.has(x.e)?`<sup class="sd" title="Equipo con sanción"></sup>`:""}</td><td>${x.pj}</td><td>${x.g}</td><td>${x.p}</td><td>${x.pf}</td><td>${x.pc}</td><td>${x.dif>0?"+":""}${x.dif}</td><td class="pts">${x.pts}</td></tr>`).join("");
  return `<div class="card"><table><tr><th>#</th><th class="t">Equipo</th><th>PJ</th><th>G</th><th>P</th><th>PF</th><th>PC</th><th>Dif</th><th>Pts</th></tr>${r}</table></div>
- <p style="color:var(--muted);font-size:.8rem">Clasificación ordenada por: Total puntos (Enfrentamiento directo), Diferencia de puntos, Puntos a favor.<br>Ganados: 2 punto(s).<br>Perdidos: 1 punto(s).${L.final?`<br><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:.6;margin-right:5px"></span>Zona de fase final`:""}${Object.entries(L.sanciones||{}).map(([e,p])=>` Sanción: ${e} ${p} pt.`).join("")}</p>`;
+ <p style="color:var(--muted);font-size:.8rem">Clasificación ordenada por: Total puntos (Enfrentamiento directo), Diferencia de puntos, Puntos a favor.<br>Ganados: 2 punto(s).<br>Perdidos: 1 punto(s).${sq.size?`<br><sup class="sd"></sup> Equipo con sanción (ver pestaña Sanciones)`:""}${L.final?`<br><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:.6;margin-right:5px"></span>Zona de fase final`:""}${Object.entries(L.sanciones||{}).map(([e,p])=>` Sanción: ${e} ${p} pt.`).join("")}</p>`;
 }
 function vPart(L,jugados){
  const lista=L.partidos.filter(m=>played(m)===jugados).sort((a,b)=>a.fecha.localeCompare(b.fecha)*(jugados?-1:1));
@@ -329,6 +332,7 @@ async function tarjeta(kind,L,j){
  const pl=L.partidos.filter(played),ult=pl.length?Math.max(...pl.map(m=>m.j)):0;
  let sub,b="",y=236;
  if(kind==="clas"){
+  const sq=sancEq(L);
   sub=ult?`Clasificación · tras la jornada ${ult}`:"Clasificación";
   const cols=[["PJ",580],["G",645],["P",710],["PF",795],["PC",880],["Dif",965]];
   b+=tx(78,y+34,"#",24,{c:"#6b6b70",a:"middle"})+tx(116,y+34,"Equipo",24,{c:"#6b6b70"})+cols.map(([n,x])=>tx(x,y+34,n,24,{c:"#6b6b70",a:"end"})).join("")+tx(1032,y+34,"Pts",24,{c:"#6b6b70",a:"end"});
@@ -338,7 +342,7 @@ async function tarjeta(kind,L,j){
    if(fin)b+=rc(P,y,W-2*P,62,"#e6f4e9");
    b+=rc(P,y+61,W-2*P,1,"#e3e6e8");
    const v=[x.pj,x.g,x.p,x.pf,x.pc,(x.dif>0?"+":"")+x.dif];
-   b+=tx(78,y+42,i+1,30,{b:1,a:"middle"})+tx(116,y+42,fit(x.e,30,fin,400),30,{b:fin});
+   const nm=fit(x.e,30,fin,400);b+=tx(78,y+42,i+1,30,{b:1,a:"middle"})+tx(116,y+42,nm,30,{b:fin})+(sq.has(x.e)?`<circle cx="${116+tw(nm,30,fin)+11}" cy="${y+22}" r="6" fill="#d93025"/>`:"");
    cols.forEach(([,cx],k)=>b+=tx(cx,y+42,v[k],28,{a:"end"}));
    b+=tx(1032,y+42,x.pts,32,{b:1,c:"#2a8037",a:"end"});
    y+=62;
@@ -346,6 +350,7 @@ async function tarjeta(kind,L,j){
   y+=30;
   ["Clasificación ordenada por: Total puntos (Enfrentamiento directo),","Diferencia de puntos, Puntos a favor. Ganados: 2 punto(s). Perdidos: 1 punto(s)."].forEach(t=>{b+=tx(P,y,t,22,{c:"#6b6b70"});y+=30});
   if(L.final){b+=rc(P,y-2,18,18,"#bfe3c6",4)+tx(P+28,y+13,"Zona de fase final",22,{c:"#6b6b70"});y+=30}
+  if(sq.size){b+=`<circle cx="${P+9}" cy="${y+7}" r="6" fill="#d93025"/>`+tx(P+28,y+13,"Equipo con sanción",22,{c:"#6b6b70"});y+=30}
  }else{
   const ms=L.partidos.filter(m=>m.j===j),f=ms[0]?fmt((ms[0]||{}).fecha):"";
   sub=(kind==="res"?"Resultados":"Calendario")+` · Jornada ${j}`+(kind==="cal"&&f?" · "+f:"");
@@ -403,7 +408,7 @@ function aplicaHash(){
  if(h==="captura")vista="cap";else if(vista==="cap")vista="clas";
  if(!pg){
   const i=LIGAS.findIndex(L=>h===L.id||h.startsWith(L.id+"-"));
-  if(i>=0){const sec=h.slice(LIGAS[i].id.length+1);if(!sec||SEC[sec]){li=i;if(h!=="captura")vista=SEC[sec]||"clas"}}
+  if(i>=0){const sec=h.slice(LIGAS[i].id.length+1);li=i;vista=SEC[sec]||"clas"}
   else if(!h)li=null;
  }
 }
@@ -421,8 +426,18 @@ function renderHead(){
  const ids=(li!==null&&LIGAS[li].sp)||["elmira"];
  $("sp").innerHTML=`<span>${ids.length>1?"Patrocinadores":"Patrocinador"}</span><div class="pills">${ids.map(k=>`${LG[k].u?`<a class="pill" href="${LG[k].u}" target="_blank" rel="noopener">`:`<div class="pill">`}<img src="${LG[k].src}" alt="${LG[k].n}">${LG[k].u?"</a>":"</div>"}`).join("")}</div>`;
 }
+const I2=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const TILES=[
+ ["clas","Clasificaci\u00f3n",I2('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-1.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98 1.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2z"/>')],
+ ["cal","Calendario",I2('<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>')],
+ ["res","Resultados",I2('<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M12 11h4M12 16h4M8 11h.01M8 16h.01"/>')],
+ ["rank","Ranking",I2('<path d="M12 20V10M18 20V4M6 20v-4"/>')],
+ ["san","Sanciones",I2('<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/>')],
+ ["bases","Bases",I2('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>')]
+];
+const IC=Object.fromEntries(TILES.map(([k,,ic])=>[k,ic]));
 function vHome(){
- return `<div class="cta"><a href="#arbitrar">HAZTE ÁRBITRO</a><a href="#mesa">HAZTE OFICIAL DE MESA</a></div><h2 style="margin:8px 0 10px">Elige una liga</h2>`+LIGAS.map((L,i)=>{
+ return `<h2 style="margin:8px 0 10px">Elige una liga</h2>`+LIGAS.map((L,i)=>{
   const pl=L.partidos.filter(played),pen=L.partidos.filter(m=>!played(m)).sort((x,y)=>x.j-y.j);
   const ult=pl.length?Math.max(...pl.map(m=>m.j)):0,tot=L.partidos.length?Math.max(...L.partidos.map(m=>m.j)):0;
   let est,det=[];
@@ -436,11 +451,11 @@ function render(){
  renderHead();trk();sync();
  if(pg==="form"){$("leagues").innerHTML=`<button class="tab back">← Inicio</button>`;$("views").innerHTML="";$("content").innerHTML=vForm();return}
  if(TXT[pg]){$("leagues").innerHTML=`<button class="tab back">← Inicio</button>`;$("views").innerHTML="";$("content").innerHTML=TXT[pg];return}
- if(pg==="bases"){$("leagues").innerHTML=`<button class="tab back">← Inicio</button>`;$("views").innerHTML="";$("content").innerHTML=BASES;return}
+ if(pg==="bases"){$("leagues").innerHTML=`<button class="tab back">${bk!==null?"← Volver":"← Inicio"}</button>`;$("views").innerHTML="";$("content").innerHTML=BASES;return}
  if(li===null){$("leagues").innerHTML="";$("views").innerHTML="";$("content").innerHTML=vHome();return}
  $("leagues").innerHTML=`<button class="tab back">← Otras ligas</button><span class="ln">${LIGAS[li].nombre}</span>`;
- const V=[["clas","Clasificación"],["cal","Calendario"],["res","Resultados"],["rank","Ranking"],["san","Sanciones"],["cap","Captura"]].filter(v=>v[0]!=="cap"||location.hash==="#captura");
- $("views").innerHTML=V.map(([k,n])=>`<button class="tab ${k===vista?"on":""}" data-v="${k}">${n}</button>`).join("");
+ const V=[["clas","Clasificación"],["cal","Calendario"],["res","Resultados"],["rank","Ranking"],["san","Sanciones"],["bases","Bases"],["cap","Captura"]].filter(v=>v[0]!=="cap"||location.hash==="#captura");
+ $("views").innerHTML=V.map(([k,n])=>`<button class="tab ${k===vista?"on":""}" data-v="${k}">${IC[k]||""}${n}</button>`).join("");
  const L=LIGAS[li];
  $("content").innerHTML=(L.aviso&&vista!=="cap"?`<div class="card" style="padding:14px 16px;margin-bottom:12px">${L.aviso}</div>`:"")+(!L.equipos.length?"":vista==="rank"?vRank(L):vista==="san"?vSan(L):vista==="cap"?vCap(L):vista==="clas"?`<div class="shr"><button class="shb" data-sh="clas">${ICO}Compartir imagen</button></div>`+vClas(L):vista==="cal"?vPart(L,false):vPart(L,true))+(L.col&&vista!=="cap"?colab(L):"");
 }
@@ -451,11 +466,12 @@ document.addEventListener("click",e=>{
  if(e.target.closest("#ckok")){try{localStorage.setItem("ck1","1")}catch(_){}$("ck").hidden=true;return}
  if(e.target.closest("#mn")){const m=$("menu");m.hidden=!m.hidden;$("mn").setAttribute("aria-expanded",String(!m.hidden));return}
  const mi=e.target.closest("[data-m]");
- if(mi){$("menu").hidden=true;const m=mi.dataset.m;if(m==="bases"){pg="bases";location.hash="bases"}else if(m==="arbitrar"||m==="mesa"){pg="form";rol=m;location.hash=m}else{pg=null;li=null;vista="clas";if(RUT[location.hash.slice(1)])location.hash=""}render();scrollTo(0,0);return}
+ if(mi){$("menu").hidden=true;const m=mi.dataset.m;if(m==="bases"){pg="bases";bk=null;location.hash="bases"}else if(m==="arbitrar"||m==="mesa"){pg="form";rol=m;location.hash=m}else{pg=null;li=null;vista="clas";if(RUT[location.hash.slice(1)])location.hash=""}render();scrollTo(0,0);return}
  if(!e.target.closest("#menu"))$("menu").hidden=true;
- const b=e.target.closest(".tab,.lcard");if(!b)return;
- if(b.classList.contains("back")){li=null;vista="clas";pg=null;if(RUT[location.hash.slice(1)])location.hash="";render();scrollTo(0,0);return}
- if(b.classList.contains("lcard"))scrollTo(0,0);
+  const b=e.target.closest(".tab,.lcard");if(!b)return;
+ if(b.classList.contains("back")){if(pg==="bases"&&bk!==null){li=bk;bk=null;pg=null;render();scrollTo(0,0);return}li=null;bk=null;vista="clas";pg=null;if(RUT[location.hash.slice(1)])location.hash="";render();scrollTo(0,0);return}
+ if(b.classList.contains("lcard")){scrollTo(0,0);vista="clas"}
+ if(b.dataset.v==="bases"){bk=li;pg="bases";location.hash="bases";render();scrollTo(0,0);return}
  if(b.dataset.l!==undefined)li=+b.dataset.l;
  if(b.dataset.v)vista=b.dataset.v;
  if(b.dataset.j)jc=+b.dataset.j;
