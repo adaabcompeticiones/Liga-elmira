@@ -204,11 +204,12 @@ const JER=[
 ].map(([j,l,v])=>({j,fecha:FJ[j-1],l,v,hs:null,as:null}));
 [["Los Berenjenas","17:00","Palacio de Deportes"],["AD Marianistas","19:00","Palacio de Deportes"],["Rota Warriors","19:00","Palacio de Deportes"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar=p}});
 [["Los Berenjenas",62,84],["AD Marianistas",58,56],["Rota Warriors",57,50]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hs=a;m.as=b}});
+[["Rota Basketball","17:00","Palacio de Deportes"],["Los Berenjenas","19:00","Palacio de Deportes"],["ADD Asuncion","19:00","Palacio de Deportes"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===2&&x.l===l);if(m){m.hora=h;m.lugar=p}});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
  {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
  {nombre:"LBAM Jerez",id:"lbam-jerez",lg:"lbam",final:4,col:["ayto","dipu","j2031"],equipos:EJ,partidos:JER},
- {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{},sf2:{},fin:{}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
+ {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{fecha:"2026-11-15",hora:"19:30",lugar:"Pabellón El Parque"},sf2:{fecha:"2026-11-15",hora:"18:00",lugar:"Pabellón El Parque"},fin:{}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
 ];
 /* ================================================= */
 const $=id=>document.getElementById(id);
@@ -494,7 +495,7 @@ function render(){
  const V=[["clas","Clasificación"],["cal","Calendario"],["res","Resultados"],["rank","Ranking"],["san","Sanciones"],["bases","Bases"],["cap","Captura"]].filter(v=>v[0]!=="cap"||location.hash==="#captura");
  $("views").innerHTML=V.map(([k,n])=>`<button class="tab ${k===vista?"on":""}" data-v="${k}">${IC[k]||""}${n}</button>`).join("");
  const L=LIGAS[li];
- $("content").innerHTML=(L.aviso&&vista!=="cap"?`<div class="card" style="padding:14px 16px;margin-bottom:12px">${L.aviso}</div>`:"")+(!L.equipos.length?"":vista==="rank"?vRank(L):vista==="san"?vSan(L):vista==="cap"?vCap(L):vista==="clas"?`<div class="shr"><button class="shb" data-sh="clas">${ICO}Compartir imagen</button></div>`+vClas(L)+vFase(L):vista==="cal"?vPart(L,false):vPart(L,true))+(L.col&&vista!=="cap"?colab(L):"");
+ $("content").innerHTML=(L.aviso&&vista!=="cap"?`<div class="card" style="padding:14px 16px;margin-bottom:12px">${L.aviso}</div>`:"")+(!L.equipos.length?"":vista==="rank"?vRank(L):vista==="san"?vSan(L):vista==="cap"?vCap(L):vista==="clas"?`<div class="shr"><button class="shb" data-sh="clas">${ICO}Compartir imagen</button></div>`+vClas(L)+vFase(L):vista==="cal"?vPart(L,false)+vFase(L):vPart(L,true))+(L.col&&vista!=="cap"?colab(L):"");
 }
 document.addEventListener("click",e=>{
   const so=e.target.closest("[data-soc]");if(so)gc({path:"clic-"+so.dataset.soc,title:"Clic "+so.dataset.soc,event:true});
