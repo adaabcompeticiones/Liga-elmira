@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://adaabcompeticiones.com.es/sitemap.xml
