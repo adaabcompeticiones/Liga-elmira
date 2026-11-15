@@ -209,15 +209,16 @@ const JER=[
 [8,"AD Marianistas","Club Nazaret"],[8,"Los Berenjenas","ADD Asuncion"],[8,"Rota Warriors","Rota Basketball"],
 [9,"ADD Asuncion","Rota Warriors"],[9,"Rota Basketball","Club Nazaret"],[9,"Los Berenjenas","AD Marianistas"],
 [10,"AD Marianistas","Rota Warriors"],[10,"Club Nazaret","Los Berenjenas"],[10,"ADD Asuncion","Rota Basketball"]
-].map(([j,l,v])=>({j,fecha:FJ[j-1],l,v,hs:null,as:null}));
+].map(([j,l,v])=>({j,fecha:FJ[j-1],l,v,hs:null,as:null,lugar:"Palacio de Deportes"}));
 [["Los Berenjenas","17:00","Palacio de Deportes"],["AD Marianistas","19:00","Palacio de Deportes"],["Rota Warriors","19:00","Palacio de Deportes"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hora=h;m.lugar=p}});
 [["Los Berenjenas",62,84],["AD Marianistas",58,56],["Rota Warriors",57,50]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hs=a;m.as=b}});
 [["Rota Basketball","17:00","Palacio de Deportes"],["Los Berenjenas","19:00","Palacio de Deportes"],["ADD Asuncion","19:00","Palacio de Deportes"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===2&&x.l===l);if(m){m.hora=h;m.lugar=p}});
+[["Rota Basketball",61,63],["Los Berenjenas",98,94],["ADD Asuncion",58,59]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===2&&x.l===l);if(m){m.hs=a;m.as=b}});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
  {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
  {nombre:"LBAM Jerez",id:"lbam-jerez",lg:"lbam",final:4,col:["ayto","dipu","j2031"],equipos:EJ,partidos:JER},
- {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{fecha:"2026-11-15",hora:"19:30",lugar:"Pabellón El Parque"},sf2:{fecha:"2026-11-15",hora:"18:00",lugar:"Pabellón El Parque"},fin:{}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
+ {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{fecha:"2026-11-15",hora:"19:30",lugar:"Pabellón El Parque",hs:71,as:45},sf2:{fecha:"2026-11-15",hora:"18:00",lugar:"Pabellón El Parque",hs:65,as:40},fin:{}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
 ];
 /* ================================================= */
 const $=id=>document.getElementById(id);
@@ -238,7 +239,8 @@ function clasif(L){
  const tb=Object.values(t).map(x=>({...x,pts:x.g*2+x.p-x.np+((L.sanciones||{})[x.e]||0),dif:x.pf-x.pc}))
   ;
  const mp=(x,g)=>L.partidos.filter(m=>played(m)&&g.includes(m.l)&&g.includes(m.v)&&(m.l===x.e||m.v===x.e)).reduce((n,m)=>{const gan=m.l===x.e?m.hs>m.as:m.as>m.hs;return n+(gan?2:(m.np?0:1))},0);
- tb.forEach(x=>{const g=tb.filter(y=>y.pts===x.pts).map(y=>y.e);x.h=g.length>1?mp(x,g):0});
+ const okH=g=>{const c=[];for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++)c.push(L.partidos.filter(m=>played(m)&&((m.l===g[i]&&m.v===g[j])||(m.l===g[j]&&m.v===g[i]))).length);return c.length>0&&c.every(v=>v===c[0]&&v>0)};
+ tb.forEach(x=>{const g=tb.filter(y=>y.pts===x.pts).map(y=>y.e);x.h=g.length>1&&okH(g)?mp(x,g):0});
  return tb.sort((a,b)=>b.pts-a.pts||b.h-a.h||b.dif-a.dif||b.pf-a.pf);
 }
 function sancEq(L){return new Set((L.sanc||[]).map(x=>x.tipo==="Equipo"?x.nombre:x.equipo).filter(Boolean))}
