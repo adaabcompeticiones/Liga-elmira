@@ -214,11 +214,12 @@ const JER=[
 [["Los Berenjenas",62,84],["AD Marianistas",58,56],["Rota Warriors",57,50]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===1&&x.l===l);if(m){m.hs=a;m.as=b}});
 [["Rota Basketball","17:00","Palacio de Deportes"],["Los Berenjenas","19:00","Palacio de Deportes"],["ADD Asuncion","19:00","Palacio de Deportes"]].forEach(([l,h,p])=>{const m=JER.find(x=>x.j===2&&x.l===l);if(m){m.hora=h;m.lugar=p}});
 [["Rota Basketball",61,63],["Los Berenjenas",98,94],["ADD Asuncion",58,59]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===2&&x.l===l);if(m){m.hs=a;m.as=b}});
+[["Rota Basketball","17:00"],["ADD Asuncion","19:00"],["Club Nazaret","19:00"]].forEach(([l,h])=>{const m=JER.find(x=>x.j===3&&x.l===l);if(m)m.hora=h});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
  {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
  {nombre:"LBAM Jerez",id:"lbam-jerez",lg:"lbam",final:4,col:["ayto","dipu","j2031"],equipos:EJ,partidos:JER},
- {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{fecha:"2026-11-15",hora:"19:30",lugar:"Pabellón El Parque",hs:71,as:45},sf2:{fecha:"2026-11-15",hora:"18:00",lugar:"Pabellón El Parque",hs:65,as:40},fin:{}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
+ {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{fecha:"2026-11-15",hora:"19:30",lugar:"Pabellón El Parque",hs:71,as:45},sf2:{fecha:"2026-11-15",hora:"18:00",lugar:"Pabellón El Parque",hs:65,as:40},t3:{fecha:"2026-11-22",hora:"18:00",lugar:"Pabellón Bahía Sur"},fin:{fecha:"2026-11-22",hora:"19:30",lugar:"Pabellón Bahía Sur"}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
 ];
 /* ================================================= */
 const $=id=>document.getElementById(id);
@@ -251,7 +252,7 @@ function vClas(L){
  <p style="color:var(--muted);font-size:.8rem">Clasificación ordenada por: Total puntos (Enfrentamiento directo), Diferencia de puntos, Puntos a favor.<br>Ganados: 2 punto(s).<br>Perdidos: 1 punto(s).${sq.size?`<br><sup class="sd"></sup> Equipo con sanción (ver pestaña Sanciones)`:""}${L.final?`<br><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:.6;margin-right:5px"></span>Zona de fase final`:""}${Object.entries(L.sanciones||{}).map(([e,p])=>` Sanción: ${e} ${p} pt.`).join("")}</p>`;
 }
 function vPart(L,jugados){
- const lista=L.partidos.filter(m=>played(m)===jugados).sort((a,b)=>a.fecha.localeCompare(b.fecha)*(jugados?-1:1));
+ const lista=L.partidos.filter(m=>played(m)===jugados).sort((a,b)=>a.fecha.localeCompare(b.fecha)*(jugados?-1:1)||(a.hora||"99").localeCompare(b.hora||"99"));
  if(!lista.length)return `<div class="card" style="padding:16px;color:var(--muted)">${jugados?"Aún no hay resultados.":"No hay partidos pendientes."}</div>`;
  const por={};lista.forEach(m=>(por[m.j]=por[m.j]||[]).push(m));
  return Object.keys(por).sort((a,b)=>jugados?b-a:a-b).map(j=>`<h2 class="jh">Jornada ${j}<button class="shb" data-sh="${jugados?"res":"cal"}" data-j="${j}">${ICO}Compartir</button></h2><div class="card">${por[j].map(m=>{
@@ -373,6 +374,7 @@ async function tarjeta(kind,L,j){
   const t=clasif(L).slice(0,4),F=L.ff||{};
   const win=(m,a,z)=>m&&m.hs!=null&&m.as!=null?(m.hs>m.as?a:z):null;
   const w1=win(F.sf1,t[0].e,t[3].e),w2=win(F.sf2,t[1].e,t[2].e),wf=win(F.fin,w1,w2);
+ const los=(m,a,z)=>m&&m.hs!=null&&m.as!=null?(m.hs>m.as?z:a):null,l1=los(F.sf1,t[0].e,t[3].e),l2=los(F.sf2,t[1].e,t[2].e),w3=F.t3?win(F.t3,l1,l2):null;
   sub="Cuadro de la fase final";
   const row=(nom,A,B,m)=>{m=m||{};const p=m.hs!=null&&m.as!=null,ga=p&&m.hs>m.as,gb=p&&m.as>m.hs,c=W/2;
    b+=tx(P,y+22,nom,24,{c:"#6b6b70",b:1});
@@ -383,10 +385,12 @@ async function tarjeta(kind,L,j){
    b+=rc(P,y+142,W-2*P,1,"#e3e6e8");y+=156};
   row("Semifinal 1","1.\u00ba "+t[0].e,t[3].e+" 4.\u00ba",F.sf1);
   row("Semifinal 2","2.\u00ba "+t[1].e,t[2].e+" 3.\u00ba",F.sf2);
+  if(F.t3)row("Tercer y cuarto puesto",l1||"Perdedor semifinal 1",l2||"Perdedor semifinal 2",F.t3);
   row("Final",w1||"Ganador semifinal 1",w2||"Ganador semifinal 2",F.fin);
   if(wf){y+=14;b+=rc(P,y,W-2*P,70,"#e6f4e9",14)+tx(W/2,y+46,"CAMPE\u00d3N: "+wf,34,{b:1,c:"#2a8037",a:"middle"});y+=70}
+  if(w3){y+=16;b+=tx(W/2,y+30,"3.\u00ba puesto: "+w3,28,{c:"#6b6b70",a:"middle"});y+=40}
  }else{
-  const ms=L.partidos.filter(m=>m.j===j),f=ms[0]?fmt((ms[0]||{}).fecha):"";
+  const ms=L.partidos.filter(m=>m.j===j).sort((x,y)=>(x.hora||"99").localeCompare(y.hora||"99")),f=ms[0]?fmt((ms[0]||{}).fecha):"";
   sub=(kind==="res"?"Resultados":"Calendario")+` · Jornada ${j}`+(kind==="cal"&&f?" · "+f:"");
   ms.forEach(m=>{
    const p=played(m),gl=p&&m.hs>m.as,gv=p&&m.as>m.hs,c=W/2;
@@ -478,11 +482,13 @@ function vFase(L){
   const inf=[fmt(m.fecha)+(m.hora?" \u00b7 "+m.hora:""),m.lugar||""].filter(Boolean).join(" \u00b7 ")||"Fecha y hora por confirmar";
   return `<div class="ffm"><div class="ffn">${nom}</div><div class="ffe"><span class="${ga?"w":""}">${a}</span><span class="ffs">${p?m.hs+" \u2013 "+m.as:"vs"}</span><span class="${gb?"w":""}">${b}</span></div><div class="ffi">${inf}</div></div>`};
  const w1=win(F.sf1,t[0].e,t[3].e),w2=win(F.sf2,t[1].e,t[2].e),wf=win(F.fin,w1,w2);
+ const los=(m,a,z)=>m&&m.hs!=null&&m.as!=null?(m.hs>m.as?z:a):null,l1=los(F.sf1,t[0].e,t[3].e),l2=los(F.sf2,t[1].e,t[2].e),w3=F.t3?win(F.t3,l1,l2):null;
  return `<h2 class="jh">Fase final \u00b7 final a 4<button class="shb" data-sh="ff">${ICO}Compartir</button></h2><div class="card">`+
   line("Semifinal 1",`1.\u00ba ${t[0].e}`,`${t[3].e} 4.\u00ba`,F.sf1)+
   line("Semifinal 2",`2.\u00ba ${t[1].e}`,`${t[2].e} 3.\u00ba`,F.sf2)+
+  (F.t3?line("Tercer y cuarto puesto",l1||"Perdedor semifinal 1",l2||"Perdedor semifinal 2",F.t3):"")+
   line("Final",w1||"Ganador semifinal 1",w2||"Ganador semifinal 2",F.fin)+
-  (wf?`<div class="ffc">\ud83c\udfc6 Campe\u00f3n: ${wf}</div>`:"")+`</div>`;
+  (wf?`<div class="ffc">\ud83c\udfc6 Campe\u00f3n: ${wf}</div>`:"")+(w3?`<div class="ffc" style="color:var(--text);font-weight:600;padding-top:6px">\ud83e\udd49 3.\u00ba puesto: ${w3}</div>`:"")+`</div>`;
 }
 function vHome(){
  return `<h2 style="margin:8px 0 10px">Elige una liga</h2>`+LIGAS.map((L,i)=>{
