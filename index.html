@@ -216,9 +216,28 @@ const JER=[
 [["Rota Basketball",61,63],["Los Berenjenas",98,94],["ADD Asuncion",58,59]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===2&&x.l===l);if(m){m.hs=a;m.as=b}});
 [["Rota Basketball","17:00"],["ADD Asuncion","19:00"],["Club Nazaret","19:00"]].forEach(([l,h])=>{const m=JER.find(x=>x.j===3&&x.l===l);if(m)m.hora=h});
 [["Rota Basketball",64,74],["Club Nazaret",57,63],["ADD Asuncion",42,48]].forEach(([l,a,b])=>{const m=JER.find(x=>x.j===3&&x.l===l);if(m){m.hs=a;m.as=b}});
+[["Club Nazaret","17:00"],["Rota Warriors","19:00"],["AD Marianistas","19:00"]].forEach(([l,h])=>{const m=JER.find(x=>x.j===4&&x.l===l);if(m)m.hora=h});
+const FB=["2026-11-29", "2026-12-13", "2026-12-20", "2027-01-10", "2027-01-17", "2027-01-24", "2027-01-31", "2027-02-21", "2027-03-07", "2027-03-14", "2027-04-04", "2027-04-11", "2027-04-18", "2027-04-25"];
+const BAH=[
+[1,"EDM Benalup - Casas Viejas","CB Azor Chiclana"],[1,"CB Livendo","Los Hombres de Grosso"],[1,"CB Baraka","CB Ciudad de Cádiz"],
+[2,"CB Azor Chiclana","CB Senior Togasur"],[2,"CB Ciudad de Cádiz","EDM Benalup - Casas Viejas"],[2,"Los Hombres de Grosso","CB Baraka"],
+[3,"CB Ciudad de Cádiz","CB Azor Chiclana"],[3,"Los Hombres de Grosso","EDM Benalup - Casas Viejas"],[3,"CB Senior Togasur","CB Livendo"],
+[4,"CB Livendo","CB Baraka"],[4,"CB Senior Togasur","CB Ciudad de Cádiz"],[4,"CB Azor Chiclana","Los Hombres de Grosso"],
+[5,"EDM Benalup - Casas Viejas","CB Livendo"],[5,"Los Hombres de Grosso","CB Ciudad de Cádiz"],[5,"CB Baraka","CB Senior Togasur"],
+[6,"CB Livendo","CB Azor Chiclana"],[6,"CB Baraka","EDM Benalup - Casas Viejas"],[6,"CB Senior Togasur","Los Hombres de Grosso"],
+[7,"CB Ciudad de Cádiz","CB Livendo"],[7,"CB Azor Chiclana","CB Baraka"],[7,"EDM Benalup - Casas Viejas","CB Senior Togasur"],
+[8,"CB Azor Chiclana","EDM Benalup - Casas Viejas"],[8,"Los Hombres de Grosso","CB Livendo"],[8,"CB Ciudad de Cádiz","CB Baraka"],
+[9,"CB Senior Togasur","CB Azor Chiclana"],[9,"EDM Benalup - Casas Viejas","CB Ciudad de Cádiz"],[9,"CB Baraka","Los Hombres de Grosso"],
+[10,"CB Azor Chiclana","CB Ciudad de Cádiz"],[10,"EDM Benalup - Casas Viejas","Los Hombres de Grosso"],[10,"CB Livendo","CB Senior Togasur"],
+[11,"CB Baraka","CB Livendo"],[11,"CB Ciudad de Cádiz","CB Senior Togasur"],[11,"Los Hombres de Grosso","CB Azor Chiclana"],
+[12,"CB Livendo","EDM Benalup - Casas Viejas"],[12,"CB Ciudad de Cádiz","Los Hombres de Grosso"],[12,"CB Senior Togasur","CB Baraka"],
+[13,"CB Azor Chiclana","CB Livendo"],[13,"EDM Benalup - Casas Viejas","CB Baraka"],[13,"Los Hombres de Grosso","CB Senior Togasur"],
+[14,"CB Livendo","CB Ciudad de Cádiz"],[14,"CB Baraka","CB Azor Chiclana"],[14,"CB Senior Togasur","EDM Benalup - Casas Viejas"]
+].map(([j,l,v])=>({j,fecha:FB[j-1],l,v,hs:null,as:null,lugar:"Pabellón El Parque"}));
+[["EDM Benalup - Casas Viejas","18:00"],["CB Livendo","18:00"],["CB Baraka","19:30"]].forEach(([l,h])=>{const m=BAH.find(x=>x.j===1&&x.l===l);if(m)m.hora=h});
 const AV="¡Muy pronto! Próximamente: calendario y clasificación.";
 const LIGAS=[
- {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,aviso:"¡Muy pronto! Equipos confirmados hasta ahora. El calendario se publicará próximamente.",col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior","CB Baraka"],partidos:[]},
+ {nombre:"LBAM Bahía de Cádiz",id:"lbam-bahia",lg:"lbam",final:4,col:["ayf","acd","u4","dipu"],equipos:["CB Azor Chiclana","EDM Benalup - Casas Viejas","CB Livendo","Los Hombres de Grosso","CB Ciudad de Cádiz","CB Senior Togasur","CB Baraka"],partidos:BAH},
  {nombre:"LBAM Jerez",id:"lbam-jerez",lg:"lbam",final:4,col:["ayto","dipu","j2031"],equipos:EJ,partidos:JER},
  {nombre:"LBAF Bahía de Cádiz 25-26",id:"lbaf-bahia",lg:"lbaf",final:4,ff:{sf1:{fecha:"2026-11-15",hora:"19:30",lugar:"Pabellón El Parque",hs:71,as:45},sf2:{fecha:"2026-11-15",hora:"18:00",lugar:"Pabellón El Parque",hs:65,as:40},t3:{fecha:"2026-11-22",hora:"18:00",lugar:"Pabellón Bahía Sur",hs:54,as:56},fin:{fecha:"2026-11-22",hora:"19:30",lugar:"Pabellón Bahía Sur",hs:60,as:54}},col:["ayf","acd","u4","dipu"],sanc:[{tipo:"Equipo",nombre:"Tercer Tiempo",jornada:9,motivo:"No se presenta al partido ante Club La Salina.",sancion:"Partido perdido por 20-0 y 0 puntos en la clasificación."}],equipos:Object.values(T),partidos:FEM}
 ];
